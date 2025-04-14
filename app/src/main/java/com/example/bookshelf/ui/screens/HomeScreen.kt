@@ -3,12 +3,17 @@ package com.example.bookshelf.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -25,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -85,15 +91,37 @@ fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
         }
     }
 }
+
 @Composable
 fun BookshelfCard(book: BookDetail, modifier: Modifier = Modifier) {
-    Card(modifier = modifier, shape = RoundedCornerShape(8.dp)) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(350.dp), // Set fixed height for consistency
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(12.dp)
+        ) {
             Text(
                 text = book.title,
-                modifier = Modifier.padding(8.dp),
-                style = MaterialTheme.typography.titleMedium
+                modifier = Modifier.padding(bottom = 4.dp),
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
+
+            if (book.authors.isNotEmpty()) {
+                Text(
+                    text = "By ${book.authors.joinToString(", ")}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Light,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
 
             if (book.thumbnail.isNotEmpty()) {
                 AsyncImage(
@@ -102,7 +130,9 @@ fun BookshelfCard(book: BookDetail, modifier: Modifier = Modifier) {
                         .crossfade(true)
                         .build(),
                     contentDescription = book.title,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp), // Fixed image height
                     contentScale = ContentScale.Crop,
                     error = painterResource(R.drawable.ic_broken_image),
                     placeholder = painterResource(R.drawable.loading_img)
@@ -111,13 +141,16 @@ fun BookshelfCard(book: BookDetail, modifier: Modifier = Modifier) {
 
             Text(
                 text = book.description,
-                modifier = Modifier.padding(8.dp),
-                style = MaterialTheme.typography.bodyMedium
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .fillMaxWidth(),
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 3, // Clamp lines
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
 }
-
 
 @Composable
 private fun BookshelfListScreen(
@@ -125,18 +158,21 @@ private fun BookshelfListScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    LazyColumn(
-        modifier = modifier,
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2), // Two-column grid
+        modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(
             items = bookshelf,
-            key = { bookshelf ->
-                bookshelf.id // fixed: using `id` instead of `name`
-            }
-        ) { bookshelf ->
-            BookshelfCard(book = bookshelf, modifier = Modifier.fillMaxSize())
+            key = { it.id }
+        ) { book ->
+            BookshelfCard(
+                book = book,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

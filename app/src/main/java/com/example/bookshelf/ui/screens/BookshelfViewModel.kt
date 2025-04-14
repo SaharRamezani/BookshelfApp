@@ -28,7 +28,7 @@ class BookshelfViewModel(
     var bookshelfUiState: BookshelfUiState by mutableStateOf(BookshelfUiState.Loading)
         private set
 
-    private val defaultQuery = "android"
+    private val defaultQuery = "jazz"
 
     init {
         getBookShelf(defaultQuery)
