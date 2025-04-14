@@ -1,5 +1,8 @@
 package com.example.bookshelf.ui.screens
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -11,9 +14,6 @@ import com.example.bookshelf.model.BookDetail
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 
 sealed interface BookshelfUiState {
     data class Success(val bookshelf: List<BookDetail>) : BookshelfUiState
