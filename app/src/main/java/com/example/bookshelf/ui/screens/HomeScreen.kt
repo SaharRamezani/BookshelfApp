@@ -31,12 +31,11 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.bookshelf.R
 import com.example.bookshelf.model.BookDetail
-import com.example.bookshelf.ui.theme.bookshelfTheme
+import com.example.bookshelf.ui.theme.BookshelfTheme
 
 @Composable
 fun HomeScreen(
     bookshelfUiState: BookshelfUiState,
-    retryAction: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -53,7 +52,8 @@ fun HomeScreen(
                     ),
                 contentPadding = contentPadding
             )
-        else -> ErrorScreen(retryAction, modifier)
+        else -> Text("An error occurred.", modifier = modifier)
+
     }
 }
 
@@ -85,33 +85,39 @@ fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
         }
     }
 }
-
 @Composable
 fun BookshelfCard(book: BookDetail, modifier: Modifier = Modifier) {
     Card(modifier = modifier, shape = RoundedCornerShape(8.dp)) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = book.volumeInfo.title,
+                text = book.title,
                 modifier = Modifier.padding(8.dp),
                 style = MaterialTheme.typography.titleMedium
             )
-            val thumbnailUrl = book.volumeInfo.imageLinks?.thumbnail?.replace("http://", "https://")
-            if (thumbnailUrl != null) {
+
+            if (book.thumbnail.isNotEmpty()) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(thumbnailUrl)
+                        .data(book.thumbnail)
                         .crossfade(true)
                         .build(),
-                    contentDescription = book.volumeInfo.title,
+                    contentDescription = book.title,
                     modifier = Modifier.fillMaxWidth(),
                     contentScale = ContentScale.Crop,
                     error = painterResource(R.drawable.ic_broken_image),
                     placeholder = painterResource(R.drawable.loading_img)
                 )
             }
+
+            Text(
+                text = book.description,
+                modifier = Modifier.padding(8.dp),
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
+
 
 @Composable
 private fun BookshelfListScreen(

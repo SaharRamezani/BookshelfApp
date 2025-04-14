@@ -21,18 +21,20 @@ sealed interface BookshelfUiState {
     object Loading : BookshelfUiState
 }
 
-class BookshelfViewModel(private val bookshelfRepository: BookshelfRepository) : ViewModel() {
+class BookshelfViewModel(
+    private val bookshelfRepository: BookshelfRepository
+) : ViewModel() {
 
     var bookshelfUiState: BookshelfUiState by mutableStateOf(BookshelfUiState.Loading)
         private set
 
-    private val lastQuery = "android" // or manage dynamically if needed
+    private val defaultQuery = "android"
 
     init {
-        getBookShelf(lastQuery)
+        getBookShelf(defaultQuery)
     }
 
-    fun getBookShelf(query: String) {
+    private fun getBookShelf(query: String) {
         viewModelScope.launch {
             bookshelfUiState = BookshelfUiState.Loading
             bookshelfUiState = try {
@@ -45,17 +47,19 @@ class BookshelfViewModel(private val bookshelfRepository: BookshelfRepository) :
         }
     }
 
-    // No-argument function for retry
-    fun retry() {
-        getBookShelf(lastQuery)
-    }
-
+    /**
+     * Factory for [BookshelfViewModel] that takes [BookshelfRepository] as a dependency.
+     */
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as BookshelfApplication)
-                val repository = application.container.bookshelfRepository
-                BookshelfViewModel(repository)
+                val application = checkNotNull(
+                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
+                ) as? BookshelfApplication
+                    ?: throw IllegalStateException("Application must be of type BookshelfApplication")
+
+                val bookshelfRepository = application.container.bookshelfRepository
+                BookshelfViewModel(bookshelfRepository)
             }
         }
     }

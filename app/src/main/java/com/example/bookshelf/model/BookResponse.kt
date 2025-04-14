@@ -3,33 +3,27 @@ package com.example.bookshelf.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Data class that defines an amphibian which includes a name, type, description, and image URL.
- */
-
 @Serializable
 data class BooksResponse(
-    val items: List<BookItem>
+    val items: List<Volume> = emptyList()
 )
 
 @Serializable
-data class BookItem(
-    val id: String
-)
-
-@Serializable
-data class BookDetail(
+data class Volume(
     val id: String,
     val volumeInfo: VolumeInfo
 )
 
+
 @Serializable
 data class VolumeInfo(
-    val title: String,
-    val imageLinks: ImageLinks?
+    val title: String = "",
+    val authors: List<String> = emptyList(),
+    val description: String = "",
+    val imageLinks: ImageLinks? = null
 )
 
 @Serializable
 data class ImageLinks(
-    val thumbnail: String
+    val thumbnail: String? = null
 )

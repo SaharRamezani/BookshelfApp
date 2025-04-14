@@ -20,6 +20,9 @@ import com.example.bookshelf.ui.screens.HomeScreen
 //In this app, it's necessary because the TopAppBar used in the scaffold is part of the experimental Material3 API.
 @Composable
 fun BookshelfApp() {
+    val bookshelfViewModel: BookshelfViewModel =
+        viewModel(factory = BookshelfViewModel.Factory)
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -32,19 +35,17 @@ fun BookshelfApp() {
                 }
             )
         }
-    ) {
+    ) { paddingValues ->
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            val bookshelfViewModel: BookshelfViewModel =
-                viewModel(factory = BookshelfViewModel.Factory)
             HomeScreen(
                 bookshelfUiState = bookshelfViewModel.bookshelfUiState,
-                retryAction = bookshelfViewModel::retry,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = it
+                contentPadding = paddingValues
             )
         }
     }
 }
+

@@ -7,23 +7,29 @@ import com.example.bookshelf.network.BookshelfApiService
  * Repository interface for retrieving book data from a data source.
  */
 interface BookshelfRepository {
-    /**
-     * Fetches a list of detailed book information based on the provided search query.
-     */
     suspend fun getBooks(query: String): List<BookDetail>
 }
+
+
 
 /**
  * Implementation of the repository that retrieves book data from the Google Books API.
  */
 class DefaultBookshelfRepository(
-    private val apiService: BookshelfApiService
+    private val bookshelfApiService: BookshelfApiService
 ) : BookshelfRepository {
 
     override suspend fun getBooks(query: String): List<BookDetail> {
-        val booksResponse = apiService.getBooks(query)
-        return booksResponse.items.map { item ->
-            apiService.getBookDetail(item.id)
+        val response = bookshelfApiService.searchBooks(query)
+        return response.items.map {
+            BookDetail(
+                id = it.id,
+                title = it.volumeInfo.title,
+                authors = it.volumeInfo.authors,
+                description = it.volumeInfo.description,
+                thumbnail = it.volumeInfo.imageLinks?.thumbnail?.replace("http://", "https://") ?: ""
+            )
         }
     }
 }
+
